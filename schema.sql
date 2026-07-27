@@ -4,6 +4,7 @@ create extension if not exists pgcrypto;
 
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
+  order_seq bigserial,                -- powers the MB-0000001 style order number
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   customer_name text not null default '',
@@ -22,3 +23,12 @@ create table if not exists orders (
 -- only your Edge Functions (using the service_role key) can read/write it.
 -- This keeps customer emails/phone numbers private by default.
 alter table orders enable row level security;
+
+-- ---------------------------------------------------------------
+-- MIGRATION: if your 'orders' table already exists from an earlier
+-- run of this file, CREATE TABLE IF NOT EXISTS above won't add the
+-- new column. Run this once instead:
+--
+--   alter table orders add column if not exists order_seq bigserial;
+-- ---------------------------------------------------------------
+

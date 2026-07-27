@@ -1075,7 +1075,9 @@
             });
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
-              showStatus('Order placed — merci & grazie! Check your email for confirmation.', 'success');
+
+              const orderNumber = verifyData.order_number || data.order_number || '';
+              showStatus(`Order ${orderNumber} placed — merci & grazie! Check your email for confirmation.`, 'success');
               cart = [];
               renderCart();
             } else {
