@@ -3,15 +3,18 @@
 // Required secrets (set with `supabase secrets set`):
 //   RAZORPAY_KEY_ID
 //   RAZORPAY_KEY_SECRET
-// SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided automatically
-// by the Supabase Edge Functions runtime — you don't need to set those.
+//   PROJECT_URL        e.g. https://abcdefgh.supabase.co
+//   SERVICE_ROLE_KEY   from Project Settings -> API -> service_role key
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RAZORPAY_KEY_ID = Deno.env.get("RAZORPAY_KEY_ID")!;
 const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET")!;
-const SUPABASE_URL = Deno.env.get("https://xhdldiwvznjxkiedczun.supabase.co")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("sb_secret_058iYozLD09Ox4OD2IpdBg_A8jpJXmI")!;
+// Using our own secret names (not the SUPABASE_ prefixed ones) because
+// auto-injection of those has been inconsistent across projects/key systems.
+const PROJECT_URL = Deno.env.get("https://xhdldiwvznjxkiedczun.supabase.co")!;
+const SERVICE_ROLE_KEY = Deno.env.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZGxkaXd2em5qeGtpZWRjenVuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTE0MDY4MiwiZXhwIjoyMTAwNzE2NjgyfQ.a1HnpxTUvhgFqNLdclRD6QGlXT1GQToR9Aki-bSDp5E")!;
+
 
 // The menu lives here, server-side, so a modified client request can
 // never change what gets charged. Keep this in sync with the prices
@@ -76,7 +79,7 @@ Deno.serve(async (req) => {
     }
     const rzpOrder = await rzpRes.json();
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
     const { data: dbOrder, error } = await supabase
       .from("orders")
       .insert({
