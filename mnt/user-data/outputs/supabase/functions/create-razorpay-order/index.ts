@@ -109,6 +109,7 @@ Deno.serve(async (req) => {
         currency: "INR",
         key_id: RAZORPAY_KEY_ID,
         db_order_id: dbOrder.id,
+        order_number: `MB-${String(dbOrder.order_seq).padStart(7, "0")}`,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
