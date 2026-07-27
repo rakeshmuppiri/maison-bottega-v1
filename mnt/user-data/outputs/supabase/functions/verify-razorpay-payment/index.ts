@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     const valid = expected === razorpay_signature;
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
-    await supabase
+    const { data: updated, error } = await supabase
       .from("orders")
       .update({
         status: valid ? "paid" : "failed",
@@ -42,11 +42,17 @@ Deno.serve(async (req) => {
         updated_at: new Date().toISOString(),
       })
       .eq("id", db_order_id)
-      .eq("razorpay_order_id", razorpay_order_id);
+      .eq("razorpay_order_id", razorpay_order_id)
+      .select()
+      .single();
 
-    return new Response(JSON.stringify({ success: valid }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        success: valid,
+        order_number: updated ? `MB-${String(updated.order_seq).padStart(7, "0")}` : null,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (e) {
     return new Response(JSON.stringify({ success: false, error: e.message }), {
       status: 500,
