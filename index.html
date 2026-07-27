@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison &amp; Bottega — French Patisserie × Italian Pasticceria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F7F1E6;
+    --cream-deep:#EFE6D4;
+    --ink:#2A1D14;
+    --ink-soft:#5A493B;
+    --pistachio:#77875A;
+    --pistachio-deep:#57633F;
+    --framboise:#AD3A52;
+    --gold:#C79341;
+    --deep:#1B120C;
+    --deep-soft:#2A1D14;
+    --rule: rgba(42,29,20,0.16);
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    font-weight:400;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  a{color:inherit; text-decoration:none;}
+
+  /* ---------- CUSTOM CURSOR ---------- */
+  @media (pointer:fine){
+    body{cursor:none;}
+    a, button, .cta-btn, .scroll-cue{cursor:none;}
+  }
+  .cursor-ring, .cursor-dot{
+    position:fixed; top:0; left:0; z-index:999;
+    pointer-events:none;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+  .cursor-ring{
+    width:34px; height:34px;
+    border:1px solid var(--ink);
+    opacity:0;
+    transition:width .28s ease, height .28s ease, border-color .28s ease, background .28s ease, opacity .2s ease;
+  }
+  .cursor-dot{
+    width:5px; height:5px;
+    background:var(--ink);
+    opacity:0;
+    transition:opacity .2s ease, background .28s ease;
+  }
+  .cursor-ring.visible, .cursor-dot.visible{opacity:1;}
+  .cursor-ring.hover{
+    width:56px; height:56px;
+    background:rgba(42,29,20,0.06);
+    border-color:var(--framboise);
+  }
+  .cursor-ring.hidden, .cursor-dot.hidden{opacity:0 !important;}
+  .cursor-ring.on-dark{border-color:#F1E6CF;}
+  .cursor-dot.on-dark{background:#F1E6CF;}
+  @media (pointer:coarse){
+    .cursor-ring, .cursor-dot{display:none;}
+  }
+  .mono{font-family:'IBM Plex Mono', monospace; letter-spacing:0.06em;}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  /* film-grain texture */
+  .grain{
+    position:fixed; inset:0; pointer-events:none; z-index:500;
+    opacity:0.035; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:200;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.6rem 2.4rem;
+    transition:background 0.4s ease, padding 0.4s ease, box-shadow .4s ease;
+  }
+  header.solid{
+    background:rgba(247,241,230,0.92);
+    backdrop-filter:blur(6px);
+    padding:1rem 2.4rem;
+    box-shadow:0 1px 0 var(--rule);
+  }
+  .logo{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:1.15rem;
+    letter-spacing:0.02em;
+    color:var(--ink);
+  }
+  header.solid .logo, .hero-nav-dark{ color:var(--ink); }
+  header:not(.solid) .logo, header:not(.solid) nav a { color:#fff; }
+  nav{display:flex; gap:2.2rem;}
+  nav a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    opacity:0.85;
+    transition:opacity .25s;
+  }
+  nav a:hover{opacity:1;}
+  header.solid nav a{color:var(--ink);}
+
+  .cart-btn{
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    width:38px; height:38px;
+    border:1px solid currentColor;
+    border-radius:50%;
+    background:none;
+    color:#fff;
+    transition:border-color .3s ease, color .3s ease, transform .2s ease;
+  }
+  header.solid .cart-btn{color:var(--ink);}
+  .cart-btn:hover{transform:scale(1.06);}
+  .cart-count{
+    position:absolute; top:-6px; right:-6px;
+    min-width:18px; height:18px; padding:0 4px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:999px;
+    background:var(--framboise);
+    color:#fff;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.62rem;
+    opacity:0; transform:scale(0.6);
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .cart-count.show{opacity:1; transform:scale(1);}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    height:100vh;
+    min-height:640px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(199,147,65,0.35), transparent 55%),
+      radial-gradient(ellipse at 75% 80%, rgba(173,58,82,0.28), transparent 55%),
+      linear-gradient(160deg, #241811 0%, #1B120C 60%, #150E09 100%);
+    color:#F7F1E6;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 26px);
+    opacity:0.6;
+  }
+  .hero-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:#D9C6A3;
+    margin-bottom:1.6rem;
+    z-index:2;
+  }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(3rem, 9vw, 7.5rem);
+    line-height:0.98;
+    letter-spacing:-0.01em;
+    z-index:2;
+  }
+  .hero h1 em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--gold);
+  }
+  .hero p{
+    z-index:2;
+    max-width:34rem;
+    margin:1.6rem auto 0;
+    font-size:1.05rem;
+    color:#E6DAC2;
+    font-weight:300;
+  }
+  .scroll-cue{
+    position:absolute; bottom:2.6rem; left:50%; transform:translateX(-50%);
+    width:118px; height:118px;
+    display:flex; align-items:center; justify-content:center;
+    z-index:2;
+  }
+  .scroll-cue .cue-ring{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    animation:cueSpin 14s linear infinite;
+    transition:filter .3s ease;
+  }
+  .scroll-cue.brighten .cue-ring{animation-duration:6s; filter:drop-shadow(0 0 10px rgba(241,230,207,0.55));}
+  @keyframes cueSpin{ to{ transform:rotate(360deg); } }
+  .scroll-cue .cue-border{
+    fill:none;
+    stroke:#C9B99B;
+    stroke-width:1;
+    opacity:0.7;
+    transition:stroke .3s ease, opacity .3s ease;
+  }
+  .scroll-cue.brighten .cue-border{stroke:#F1E6CF; opacity:1;}
+  .scroll-cue .cue-text{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.16em;
+    fill:#C9B99B;
+    text-transform:uppercase;
+    transition:fill .3s ease;
+  }
+  .scroll-cue.brighten .cue-text{fill:#F1E6CF;}
+  .scroll-cue .cue-arrow-center{
+    position:relative;
+    width:14px; height:14px;
+    border-right:1px solid #C9B99B;
+    border-bottom:1px solid #C9B99B;
+    transform:rotate(45deg) translateY(-3px);
+    animation:cueNudge 1.6s ease-in-out infinite;
+    transition:border-color .3s ease;
+  }
+  .scroll-cue.brighten .cue-arrow-center{border-color:#F1E6CF;}
+  @keyframes cueNudge{
+    0%,100%{ transform:rotate(45deg) translateY(-3px); }
+    50%{ transform:rotate(45deg) translateY(3px); }
+  }
+
+  /* ---------- DOSSIER ---------- */
+  .dossier{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+  }
+  .dossier div{
+    padding:2.2rem 2rem;
+    border-right:1px solid var(--rule);
+  }
+  .dossier div:last-child{border-right:none;}
+  .dossier .label{font-size:0.68rem; margin-bottom:0.6rem; color:var(--ink-soft);}
+  .dossier .value{font-family:'Fraunces', serif; font-size:1.15rem; font-weight:500;}
+
+  /* ---------- SECTION WRAP ---------- */
+  section{position:relative;}
+  .intro{
+    max-width:46rem;
+    margin:6.5rem auto 5rem;
+    padding:0 2.4rem;
+  }
+  .intro h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(1.9rem, 4vw, 2.6rem);
+    line-height:1.15;
+    margin-top:1rem;
+  }
+  .intro h2 em{font-style:italic; color:var(--framboise);}
+  .intro p{margin-top:1.2rem; color:var(--ink-soft); max-width:38rem;}
+
+  /* ---------- PASTRY SECTIONS ---------- */
+  .pastry{
+    display:flex;
+    align-items:center;
+    gap:5vw;
+    padding:5.5rem 6vw;
+    border-top:1px solid var(--rule);
+  }
+  .pastry.reverse{flex-direction:row-reverse;}
+  .pastry-art{
+    flex:0 0 40%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .pastry-art svg{width:100%; max-width:340px; height:auto; overflow:visible; filter:drop-shadow(0 18px 30px rgba(42,29,20,0.16));}
+  .pastry-art .base-shape{
+    stroke:none;
+    opacity:0;
+    transform:scale(0.92);
+    transform-origin:center;
+    transition:opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .pastry.in-view .pastry-art .base-shape{opacity:1; transform:scale(1);}
+  .pastry-art .base-shape:nth-of-type(2){transition-delay:.08s;}
+  .pastry-art .base-shape:nth-of-type(3){transition-delay:.16s;}
+  .pastry-art .base-shape:nth-of-type(4){transition-delay:.24s;}
+  .pastry-art .line-art{
+    fill:none;
+    stroke:var(--ink);
+    opacity:0.45;
+    stroke-width:1.4;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    stroke-dasharray:1400;
+    stroke-dashoffset:1400;
+    transition:stroke-dashoffset 1.3s cubic-bezier(.2,.7,.2,1) .35s;
+  }
+  .pastry.in-view .pastry-art .line-art{stroke-dashoffset:0;}
+  .pastry-art .fill-dot{
+    fill:currentColor; stroke:none;
+    opacity:0; transition:opacity .5s ease .9s;
+  }
+  .pastry-art .cocoa-dot{
+    fill:#4A3220; stroke:none;
+    opacity:0; transition:opacity .5s ease .9s;
+  }
+  .pastry.in-view .pastry-art .fill-dot,
+  .pastry.in-view .pastry-art .cocoa-dot{opacity:1;}
+
+  .pastry-text{flex:1;}
+  .stamp{
+    display:inline-flex; align-items:center; gap:0.55rem;
+    border:1px solid currentColor;
+    border-radius:999px;
+    padding:0.32rem 0.9rem 0.32rem 0.6rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    transform:rotate(-9deg) scale(1.5);
+    opacity:0;
+    transition:transform .55s cubic-bezier(.2,.8,.3,1.3), opacity .4s ease;
+  }
+  .pastry.in-view .stamp{transform:rotate(-6deg) scale(1); opacity:1;}
+  .stamp-dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+
+  .pastry-text h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-style:italic;
+    font-size:clamp(2.1rem, 4vw, 3.2rem);
+    margin:1.1rem 0 0.3rem;
+    line-height:1.02;
+  }
+  .pastry-text .origin{color:var(--ink-soft); font-size:0.85rem; margin-bottom:1.1rem;}
+  .pastry-text p.note{max-width:30rem; color:var(--ink-soft);}
+  .pastry-text .fact{
+    margin-top:1.4rem;
+    display:flex; gap:1.8rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+  }
+  .pastry-text .fact span{display:block; color:var(--ink); margin-top:0.2rem; font-size:0.82rem;}
+
+  .price-row{
+    display:flex; align-items:center; gap:1.2rem;
+    margin-top:1.6rem;
+  }
+  .price-row .price{font-size:1rem; color:var(--ink);}
+  .add-btn{
+    border:1px solid var(--ink);
+    background:none;
+    padding:0.65rem 1.3rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink);
+    transition:background .22s, color .22s, transform .22s;
+  }
+  .add-btn:hover{background:var(--ink); color:var(--cream);}
+  .add-btn.added{background:var(--pistachio-deep); border-color:var(--pistachio-deep); color:#fff;}
+
+  .fr{color:var(--framboise);}
+  .it{color:var(--pistachio);}
+  .go{color:var(--gold);}
+
+  /* ---------- ATELIERS ---------- */
+  .ateliers{
+    background:var(--deep);
+    color:#F1E6CF;
+    padding:6rem 6vw 7rem;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4vw;
+  }
+  .ateliers .head{grid-column:1 / -1; margin-bottom:1.5rem;}
+  .ateliers .head .eyebrow{color:#C9B99B;}
+  .ateliers .head h2{
+    font-family:'Fraunces', serif; font-weight:500; font-style:italic;
+    font-size:clamp(2rem, 4vw, 2.8rem); margin-top:0.6rem;
+  }
+  .atelier-card{
+    border-top:1px solid rgba(241,230,207,0.25);
+    padding-top:1.6rem;
+  }
+  .atelier-card .city{
+    font-family:'Fraunces', serif; font-size:1.5rem; font-style:italic; margin-bottom:0.6rem;
+  }
+  .atelier-card .addr{color:#C9B99B; font-size:0.92rem; line-height:1.7;}
+  .atelier-card .hours{margin-top:0.9rem; font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:#8E9A72;}
+
+  /* ---------- CTA / FOOTER ---------- */
+  .cta{
+    text-align:center;
+    padding:6rem 2rem 5rem;
+  }
+  .cta .eyebrow{justify-content:center; display:flex;}
+  .cta h2{
+    font-family:'Fraunces', serif; font-weight:500;
+    font-size:clamp(2rem, 5vw, 3.4rem);
+    margin:1rem 0 2rem;
+  }
+  .cta h2 em{font-style:italic; color:var(--framboise);}
+  .cta-btn{
+    display:inline-block;
+    border:1px solid var(--ink);
+    padding:0.95rem 2.2rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.75rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    transition:background .25s, color .25s;
+  }
+  .cta-btn:hover{background:var(--ink); color:var(--cream);}
+
+  footer{
+    border-top:1px solid var(--rule);
+    padding:2rem 2.4rem;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.1em;
+    color:var(--ink-soft);
+  }
+  footer a{text-transform:uppercase; color:var(--ink); border-bottom:1px solid var(--ink); padding-bottom:2px;}
+
+  @media (max-width: 860px){
+    .dossier{grid-template-columns:1fr 1fr;}
+    .dossier div{border-bottom:1px solid var(--rule);}
+    .pastry, .pastry.reverse{flex-direction:column; padding:3.5rem 6vw;}
+    .pastry-art{flex:none; margin-bottom:2rem; max-width:260px;}
+    .ateliers{grid-template-columns:1fr;}
+    nav{display:none;}
+    footer{flex-direction:column; gap:0.8rem; text-align:center;}
+    .cart-drawer{width:100%; max-width:100%;}
+  }
+
+  /* ---------- CART ---------- */
+  .cart-overlay{
+    position:fixed; inset:0; z-index:300;
+    background:rgba(27,18,12,0.45);
+    opacity:0; pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  .cart-overlay.open{opacity:1; pointer-events:auto;}
+
+  .cart-drawer{
+    position:fixed; top:0; right:0; bottom:0; z-index:301;
+    width:420px; max-width:92vw;
+    background:var(--cream);
+    display:flex; flex-direction:column;
+    transform:translateX(100%);
+    transition:transform .45s cubic-bezier(.2,.8,.2,1);
+    box-shadow:-20px 0 60px rgba(27,18,12,0.18);
+  }
+  .cart-drawer.open{transform:translateX(0);}
+
+  .cart-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.6rem 1.8rem;
+    border-bottom:1px solid var(--rule);
+  }
+  .cart-close{
+    background:none; border:none; font-size:1rem; color:var(--ink);
+    width:30px; height:30px; border-radius:50%; border:1px solid var(--rule);
+    transition:background .2s ease;
+  }
+  .cart-close:hover{background:var(--cream-deep);}
+
+  .cart-body{flex:1; overflow-y:auto; padding:1.4rem 1.8rem;}
+  .cart-empty{color:var(--ink-soft); font-size:0.92rem; padding:2rem 0; text-align:center;}
+
+  .cart-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:0.8rem;
+    padding:1rem 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .cart-item .ci-name{font-family:'Fraunces', serif; font-style:italic; font-size:1.05rem;}
+  .cart-item .ci-price{color:var(--ink-soft); font-size:0.78rem; margin-top:0.2rem;}
+  .cart-item .ci-qty{display:flex; align-items:center; gap:0.6rem;}
+  .qty-btn{
+    width:24px; height:24px; border:1px solid var(--rule); background:none;
+    font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--ink);
+    border-radius:50%;
+    transition:background .2s ease;
+  }
+  .qty-btn:hover{background:var(--cream-deep);}
+  .ci-qty span{font-family:'IBM Plex Mono', monospace; font-size:0.85rem; min-width:14px; text-align:center;}
+  .ci-remove{
+    font-family:'IBM Plex Mono', monospace; font-size:0.65rem; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--framboise); margin-left:0.6rem;
+  }
+
+  .cart-form{padding:0 1.8rem 1rem;}
+  .cart-input{
+    width:100%;
+    border:1px solid var(--rule);
+    background:#fff;
+    padding:0.7rem 0.9rem;
+    margin-bottom:0.6rem;
+    font-family:'Work Sans', sans-serif;
+    font-size:0.88rem;
+    color:var(--ink);
+  }
+  .cart-input:focus{outline:none; border-color:var(--ink);}
+
+  .cart-footer{
+    padding:1.4rem 1.8rem 1.8rem;
+    border-top:1px solid var(--rule);
+  }
+  .cart-subtotal{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Fraunces', serif; font-size:1.2rem; margin-bottom:1rem;
+  }
+  .cart-pay-btn{
+    width:100%;
+    padding:0.95rem;
+    background:var(--ink);
+    color:var(--cream);
+    border:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    transition:opacity .2s ease, background .2s ease;
+  }
+  .cart-pay-btn:disabled{opacity:0.4; cursor:not-allowed;}
+  .cart-pay-btn:not(:disabled):hover{background:var(--framboise);}
+  .cart-note{
+    margin-top:0.8rem;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+  .cart-status{
+    text-align:center; font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem; margin-top:0.7rem;
+  }
+  .cart-status.error{color:var(--framboise);}
+  .cart-status.success{color:var(--pistachio-deep);}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="croissantGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8B463"/><stop offset="1" stop-color="#A9702F"/></linearGradient>
+    <linearGradient id="cannoliGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8A659"/><stop offset="1" stop-color="#8B5A2B"/></linearGradient>
+    <linearGradient id="ricottaGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF6EA"/><stop offset="1" stop-color="#EDE0C4"/></linearGradient>
+    <linearGradient id="pastryGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2B368"/><stop offset="1" stop-color="#C08A3E"/></linearGradient>
+    <linearGradient id="creamGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBF6EA"/><stop offset="1" stop-color="#F0E6CF"/></linearGradient>
+    <linearGradient id="sfogGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#D9A24E"/><stop offset="1" stop-color="#8B5A2B"/></linearGradient>
+    <linearGradient id="ladyfingerGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9825A"/><stop offset="1" stop-color="#7C5C3A"/></linearGradient>
+    <linearGradient id="mascGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6EFDC"/><stop offset="1" stop-color="#E9DAB6"/></linearGradient>
+    <linearGradient id="chouxGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E3B66B"/><stop offset="1" stop-color="#A9782E"/></linearGradient>
+    <linearGradient id="pralineGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3E3B8"/><stop offset="1" stop-color="#E4C98B"/></linearGradient>
+  </defs>
+</svg>
+
+<header id="siteHeader">
+  <div class="logo">Maison &amp; Bottega</div>
+  <nav>
+    <a href="#dossier">About</a>
+    <a href="#menu">Menu</a>
+    <a href="#ateliers">Ateliers</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="cart-btn" id="cartBtn" aria-label="Open cart">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 12.2a2 2 0 0 0 2 1.6h7.2a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="10" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
+    <span class="cart-count" id="cartCount">0</span>
+  </button>
+</header>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+  <div class="cart-head">
+    <span class="eyebrow">Your Order</span>
+    <button class="cart-close" id="cartClose" aria-label="Close cart">✕</button>
+  </div>
+
+  <div class="cart-body" id="cartBody">
+    <p class="cart-empty" id="cartEmpty">Nothing in the box yet — add a pastry or six.</p>
+    <div class="cart-items" id="cartItems"></div>
+  </div>
+
+  <div class="cart-form" id="cartForm">
+    <div class="eyebrow" style="margin-bottom:0.9rem;">Delivery details</div>
+    <input type="text" id="custName" class="cart-input" placeholder="Full name" autocomplete="name">
+    <input type="email" id="custEmail" class="cart-input" placeholder="Email" autocomplete="email">
+    <input type="tel" id="custPhone" class="cart-input" placeholder="Phone (for delivery updates)" autocomplete="tel">
+  </div>
+
+  <div class="cart-footer">
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal" class="mono">₹0</span></div>
+    <button class="cart-pay-btn" id="cartPayBtn" disabled>Pay &amp; Place Order</button>
+    <p class="cart-note">Payments handled by Razorpay. Card and UPI details never touch this site.</p>
+  </div>
+</aside>
+
+<section class="hero">
+  <div class="hero-eyebrow">Est. 2016 · Paris &amp; Torino</div>
+  <h1>Maison<br><em>&amp; Bottega</em></h1>
+  <p>Where French lamination meets Italian ricotta. One counter, two grandmothers' worth of recipes, and a lot of butter.</p>
+  <a href="#dossier" class="scroll-cue" aria-label="Scroll down" id="scrollCue">
+    <svg class="cue-ring" viewBox="0 0 160 160" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <path id="cueCirclePath" d="M80,80 m-62,0 a62,62 0 1,1 124,0 a62,62 0 1,1 -124,0"/>
+      </defs>
+      <circle class="cue-border" cx="80" cy="80" r="78"/>
+      <text class="cue-text">
+        <textPath href="#cueCirclePath" xlink:href="#cueCirclePath" startOffset="0%">Scroll to taste &#8226; Scroll to taste &#8226; </textPath>
+      </text>
+    </svg>
+    <span class="cue-arrow-center"></span>
+  </a>
+</section>
+
+<div class="dossier" id="dossier">
+  <div><div class="eyebrow label">Discipline</div><div class="value">Patisserie &amp; Pasticceria</div></div>
+  <div><div class="eyebrow label">Counter Since</div><div class="value">2016</div></div>
+  <div><div class="eyebrow label">Ateliers</div><div class="value">Paris · Torino</div></div>
+  <div><div class="eyebrow label">Status</div><div class="value">Open daily, 7—7</div></div>
+</div>
+
+<section class="intro" id="menu">
+  <div class="eyebrow">The Case</div>
+  <h2>Six pastries, two countries, <em>no compromises.</em></h2>
+  <p>We don't fuse anything. The croissant is laminated the way it's laminated in the 6th arrondissement; the sfogliatella is shaped the way it's shaped in Naples. Nothing on this counter apologizes for where it's from.</p>
+</section>
+
+<!-- CROISSANT -->
+<div class="pastry" data-pastry data-id="croissant">
+  <div class="pastry-art fr">
+    <svg viewBox="0 0 300 260">
+      <path class="base-shape" fill="url(#croissantGrad)" d="M40 190 C 20 140, 60 60, 150 45 C 240 60, 280 140, 260 190 C 230 165, 205 195, 180 165 C 155 195, 130 165, 105 195 C 80 165, 65 195, 40 190 Z"/>
+      <path class="line-art" d="M85 165 C 115 130, 135 120, 150 118"/>
+      <path class="line-art" d="M110 185 C 145 145, 170 132, 195 130"/>
+      <path class="line-art" d="M150 45 C 160 75, 190 95, 225 115"/>
+      <circle class="fill-dot" cx="150" cy="45" r="3.5"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp fr"><span class="stamp-dot"></span>France</span>
+    <h3>The Croissant</h3>
+    <div class="origin mono">Viennoiserie · Laminated dough</div>
+    <p class="note">Twenty-seven layers of butter and dough, folded over three days, baked until the outside shatters and the inside pulls apart in ribbons. No filling. It doesn't need one.</p>
+    <div class="fact"><div>Butter<span>82% AOP</span></div><div>Proof<span>18 hours</span></div><div>Best eaten<span>Within the hour</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹180</span>
+      <button class="add-btn" data-add data-id="croissant" data-name="The Croissant" data-price="180">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- CANNOLI -->
+<div class="pastry reverse" data-pastry data-id="cannoli">
+  <div class="pastry-art it">
+    <svg viewBox="0 0 300 260">
+      <path class="base-shape" fill="url(#cannoliGrad)" d="M60 90 C 60 75, 240 75, 240 90 L 235 170 C 235 185, 65 185, 65 170 Z"/>
+      <ellipse class="base-shape" fill="url(#ricottaGrad)" cx="63" cy="95" rx="13" ry="18"/>
+      <ellipse class="base-shape" fill="url(#ricottaGrad)" cx="237" cy="95" rx="13" ry="18"/>
+      <path class="line-art" d="M60 90 C 90 100, 210 100, 240 90"/>
+      <path class="line-art" d="M65 170 C 95 160, 205 160, 235 170"/>
+      <circle class="fill-dot" cx="150" cy="110" r="2.4"/>
+      <circle class="fill-dot" cx="128" cy="135" r="2"/>
+      <circle class="fill-dot" cx="172" cy="128" r="2.2"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp it"><span class="stamp-dot"></span>Italy — Sicily</span>
+    <h3>Cannolo Siciliano</h3>
+    <div class="origin mono">Fried shell · Sweetened ricotta</div>
+    <p class="note">Fried to order, filled to order — a soggy cannolo is a crime in three regions. Sheep's-milk ricotta, drained overnight, folded with candied orange and a little too much sugar.</p>
+    <div class="fact"><div>Shell<span>Marsala wine dough</span></div><div>Filling<span>Sheep ricotta</span></div><div>Origin<span>Palermo, 12th c.</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹220</span>
+      <button class="add-btn" data-add data-id="cannoli" data-name="Cannolo Siciliano" data-price="220">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- MILLE-FEUILLE -->
+<div class="pastry" data-pastry data-id="mille-feuille">
+  <div class="pastry-art go">
+    <svg viewBox="0 0 300 260">
+      <rect class="base-shape" fill="url(#pastryGrad)" x="50" y="140" width="200" height="50" rx="3"/>
+      <rect class="base-shape" fill="url(#creamGrad)" x="50" y="100" width="200" height="40" rx="2"/>
+      <rect class="base-shape" fill="url(#pastryGrad)" x="50" y="60" width="200" height="40" rx="2"/>
+      <rect class="base-shape" fill="url(#creamGrad)" x="50" y="40" width="200" height="20" rx="4"/>
+      <path class="line-art" d="M50 190 L250 190 M50 140 L250 140 M50 100 L250 100 M50 60 L250 60 M50 40 L250 40"/>
+      <path class="line-art" d="M50 40 L50 190 M250 40 L250 190"/>
+      <circle class="fill-dot" cx="150" cy="40" r="3"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp go"><span class="stamp-dot"></span>France</span>
+    <h3>Mille-Feuille</h3>
+    <div class="origin mono">Puff pastry · Crème pâtissière</div>
+    <p class="note">"A thousand leaves," though we've never counted. Three sheets of puff, two of vanilla cream, a fondant top scored into the classic feathered pattern. Eaten with a fork, argued about with a spoon.</p>
+    <div class="fact"><div>Layers<span>729, in theory</span></div><div>Cream<span>Bourbon vanilla</span></div><div>Also called<span>Napoleon</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹260</span>
+      <button class="add-btn" data-add data-id="mille-feuille" data-name="Mille-Feuille" data-price="260">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- SFOGLIATELLA -->
+<div class="pastry reverse" data-pastry data-id="sfogliatella">
+  <div class="pastry-art it">
+    <svg viewBox="0 0 300 260">
+      <path class="base-shape" fill="url(#sfogGrad)" d="M150 30 C 210 60, 235 130, 220 210 L 80 210 C 65 130, 90 60, 150 30 Z"/>
+      <path class="line-art" d="M150 30 C 145 90, 145 150, 150 210 M120 45 C 115 100, 115 155, 120 210 M180 45 C 185 100, 185 155, 180 210"/>
+      <circle class="fill-dot" cx="150" cy="30" r="3"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp it"><span class="stamp-dot"></span>Italy — Campania</span>
+    <h3>Sfogliatella</h3>
+    <div class="origin mono">Shell-shaped · Semolina &amp; ricotta</div>
+    <p class="note">Hand-shaped into its clam ridges, filled with semolina, ricotta and candied citrus, baked until the edges char slightly. Named "riccia" for its curls. Eats loudly. That's correct.</p>
+    <div class="fact"><div>Shape<span>Riccia (curly)</span></div><div>Filling<span>Semolina-ricotta</span></div><div>Origin<span>Naples, 1600s</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹210</span>
+      <button class="add-btn" data-add data-id="sfogliatella" data-name="Sfogliatella" data-price="210">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIRAMISU -->
+<div class="pastry" data-pastry data-id="tiramisu">
+  <div class="pastry-art it">
+    <svg viewBox="0 0 300 260">
+      <rect class="base-shape" fill="url(#ladyfingerGrad)" x="50" y="155" width="200" height="45" rx="2"/>
+      <rect class="base-shape" fill="url(#mascGrad)" x="50" y="110" width="200" height="45" rx="2"/>
+      <rect class="base-shape" fill="url(#ladyfingerGrad)" x="50" y="80" width="200" height="30" rx="2"/>
+      <rect class="base-shape" fill="url(#mascGrad)" x="50" y="60" width="200" height="20" rx="2"/>
+      <path class="line-art" d="M50 200 L250 200 M50 155 L250 155 M50 110 L250 110 M50 80 L250 80 M50 60 L250 60"/>
+      <path class="line-art" d="M50 60 L50 200 M250 60 L250 200"/>
+      <circle class="cocoa-dot" cx="90" cy="68" r="2.4"/>
+      <circle class="cocoa-dot" cx="130" cy="72" r="2.2"/>
+      <circle class="cocoa-dot" cx="175" cy="66" r="2.6"/>
+      <circle class="cocoa-dot" cx="210" cy="70" r="2.1"/>
+      <circle class="cocoa-dot" cx="150" cy="64" r="2.3"/>
+      <circle class="cocoa-dot" cx="108" cy="65" r="1.8"/>
+      <circle class="cocoa-dot" cx="192" cy="73" r="1.9"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp it"><span class="stamp-dot"></span>Italy — Veneto</span>
+    <h3>Tiramisù</h3>
+    <div class="origin mono">Ladyfingers · Espresso · Mascarpone</div>
+    <p class="note">Savoiardi dipped fast — one second too long and the whole tray turns to soup — layered with mascarpone and a dusting of cocoa that should never, ever be sweetened.</p>
+    <div class="fact"><div>Name means<span>"Pick me up"</span></div><div>Coffee<span>Double espresso</span></div><div>Rest<span>12 hours, minimum</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹240</span>
+      <button class="add-btn" data-add data-id="tiramisu" data-name="Tiramisù" data-price="240">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARIS-BREST -->
+<div class="pastry reverse" data-pastry data-id="paris-brest">
+  <div class="pastry-art fr">
+    <svg viewBox="0 0 300 260">
+      <path class="base-shape" fill="url(#chouxGrad)" d="M150 40 C 220 40, 250 100, 250 130 C 250 190, 200 220, 150 220 C 100 220, 50 190, 50 130 C 50 100, 80 40, 150 40 Z"/>
+      <path class="base-shape" fill="url(#pralineGrad)" d="M150 80 C 190 80, 210 105, 210 130 C 210 165, 185 190, 150 190 C 115 190, 90 165, 90 130 C 90 105, 110 80, 150 80 Z"/>
+      <path class="line-art" d="M75 70 C 95 55, 115 47, 135 44 M165 44 C 190 48, 215 60, 232 78 M232 182 C 215 200, 190 212, 165 216 M135 216 C 110 212, 88 200, 70 182"/>
+      <circle class="fill-dot" cx="150" cy="40" r="3"/>
+    </svg>
+  </div>
+  <div class="pastry-text">
+    <span class="stamp fr"><span class="stamp-dot"></span>France</span>
+    <h3>Paris-Brest</h3>
+    <div class="origin mono">Choux ring · Praline cream</div>
+    <p class="note">Baked as a wheel in honor of the bicycle race between Paris and Brest, sliced open and packed with hazelnut praline cream. Heavier than it looks. Intentionally.</p>
+    <div class="fact"><div>Invented<span>1910, Maisons-Laffitte</span></div><div>Cream<span>Praline mousseline</span></div><div>Shape<span>Bicycle wheel</span></div></div>
+    <div class="price-row">
+      <span class="price mono">₹280</span>
+      <button class="add-btn" data-add data-id="paris-brest" data-name="Paris-Brest" data-price="280">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<section class="ateliers" id="ateliers">
+  <div class="head">
+    <div class="eyebrow">Where to find us</div>
+    <h2>Two ateliers, one recipe box.</h2>
+  </div>
+  <div class="atelier-card">
+    <div class="city">Paris</div>
+    <div class="addr">14 Rue des Jeûneurs<br>75002 Paris, France</div>
+    <div class="hours mono">Tue—Sun · 7:00—19:00</div>
+  </div>
+  <div class="atelier-card">
+    <div class="city">Torino</div>
+    <div class="addr">Via Lagrange 12<br>10123 Torino, Italy</div>
+    <div class="hours mono">Tue—Sun · 7:30—19:30</div>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="eyebrow">Reserve a table</div>
+  <h2>Come for the coffee, <em>stay for the argument.</em></h2>
+  <a class="cta-btn" href="mailto:bonjour@maisonbottega.com">Get in touch</a>
+</section>
+
+<footer>
+  <span>© 2026 Maison &amp; Bottega</span>
+  <a href="#menu">Next: Seasonal Menu →</a>
+</footer>
+
+<script>
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('solid', window.scrollY > 60);
+  });
+
+  const items = document.querySelectorAll('[data-pastry]');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add('in-view'); }
+    });
+  }, { threshold: 0.3 });
+  items.forEach(el => io.observe(el));
+
+  /* ---- custom cursor: dot snaps instantly, ring trails with easing ---- */
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const ring = document.getElementById('cursorRing');
+    const dot = document.getElementById('cursorDot');
+    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+    let started = false;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%,-50%)`;
+      if (!started) { ringX = mouseX; ringY = mouseY; started = true; }
+      ring.classList.add('visible'); dot.classList.add('visible');
+    });
+    window.addEventListener('mouseleave', () => {
+      ring.classList.remove('visible'); dot.classList.remove('visible');
+    });
+
+    function tick() {
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%,-50%)`;
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    const hoverTargets = document.querySelectorAll('a, button, .cta-btn, .stamp');
+    hoverTargets.forEach(el => {
+      if (el.classList.contains('scroll-cue')) return;
+      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    });
+
+    const scrollCue = document.getElementById('scrollCue');
+    if (scrollCue) {
+      scrollCue.addEventListener('mouseenter', () => {
+        ring.classList.remove('hover');
+        ring.classList.add('hidden');
+        dot.classList.add('hidden');
+        scrollCue.classList.add('brighten');
+      });
+      scrollCue.addEventListener('mouseleave', () => {
+        ring.classList.remove('hidden');
+        dot.classList.remove('hidden');
+        scrollCue.classList.remove('brighten');
+      });
+    }
+
+    const darkSections = document.querySelectorAll('.hero, .ateliers');
+    const darkIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { ring.classList.add('on-dark'); dot.classList.add('on-dark'); }
+      });
+    }, { threshold: 0.6 });
+    darkSections.forEach(s => darkIO.observe(s));
+    window.addEventListener('scroll', () => {
+      const overDark = [...darkSections].some(s => {
+        const r = s.getBoundingClientRect();
+        return r.top < window.innerHeight/2 && r.bottom > window.innerHeight/2;
+      });
+      ring.classList.toggle('on-dark', overDark);
+      dot.classList.toggle('on-dark', overDark);
+    });
+  }
+
+  /* =========================================================
+     BACKEND CONFIG — replace these two values after you deploy
+     the Supabase Edge Functions (see setup guide).
+     ========================================================= */
+  const FUNCTIONS_BASE = "https://xhdldiwvznjxkiedczun.functions.supabase.co"; // TODO
+  const CREATE_ORDER_URL = `${FUNCTIONS_BASE}/create-razorpay-order`;
+  const VERIFY_PAYMENT_URL = `${FUNCTIONS_BASE}/verify-razorpay-payment`;
+
+  /* ---------- CART STATE ---------- */
+  let cart = [];
+
+  const cartBtn = document.getElementById('cartBtn');
+  const cartCount = document.getElementById('cartCount');
+  const cartOverlay = document.getElementById('cartOverlay');
+  const cartDrawer = document.getElementById('cartDrawer');
+  const cartClose = document.getElementById('cartClose');
+  const cartItemsEl = document.getElementById('cartItems');
+  const cartEmptyEl = document.getElementById('cartEmpty');
+  const cartSubtotalEl = document.getElementById('cartSubtotal');
+  const cartPayBtn = document.getElementById('cartPayBtn');
+
+  function openCart(){ cartOverlay.classList.add('open'); cartDrawer.classList.add('open'); cartDrawer.setAttribute('aria-hidden','false'); }
+  function closeCart(){ cartOverlay.classList.remove('open'); cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); }
+  cartBtn.addEventListener('click', openCart);
+  cartClose.addEventListener('click', closeCart);
+  cartOverlay.addEventListener('click', closeCart);
+
+  function addToCart(id, name, price, btn){
+    const existing = cart.find(i => i.id === id);
+    if (existing) { existing.qty += 1; }
+    else { cart.push({ id, name, price, qty: 1 }); }
+    renderCart();
+    openCart();
+    if (btn) {
+      btn.classList.add('added');
+      btn.textContent = 'Added ✓';
+      setTimeout(() => { btn.classList.remove('added'); btn.textContent = 'Add to cart'; }, 1200);
+    }
+  }
+
+  document.querySelectorAll('[data-add]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      addToCart(btn.dataset.id, btn.dataset.name, Number(btn.dataset.price), btn);
+    });
+  });
+
+  function changeQty(id, delta){
+    const item = cart.find(i => i.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+    renderCart();
+  }
+
+  function renderCart(){
+    const count = cart.reduce((sum, i) => sum + i.qty, 0);
+    cartCount.textContent = count;
+    cartCount.classList.toggle('show', count > 0);
+
+    cartItemsEl.innerHTML = '';
+    if (cart.length === 0){
+      cartEmptyEl.style.display = 'block';
+    } else {
+      cartEmptyEl.style.display = 'none';
+      cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'cart-item';
+        row.innerHTML = `
+          <div>
+            <div class="ci-name">${item.name}</div>
+            <div class="ci-price mono">₹${item.price} each</div>
+          </div>
+          <div class="ci-qty">
+            <button class="qty-btn" data-dec="${item.id}">–</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" data-inc="${item.id}">+</button>
+          </div>`;
+        cartItemsEl.appendChild(row);
+      });
+      cartItemsEl.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.inc, 1)));
+      cartItemsEl.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => changeQty(b.dataset.dec, -1)));
+    }
+
+    const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    cartSubtotalEl.textContent = `₹${subtotal}`;
+    cartPayBtn.disabled = cart.length === 0;
+  }
+
+  /* ---------- CHECKOUT ---------- */
+  function showStatus(msg, type){
+    let el = document.getElementById('cartStatus');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'cartStatus';
+      el.className = 'cart-status';
+      cartPayBtn.insertAdjacentElement('afterend', el);
+    }
+    el.textContent = msg;
+    el.className = `cart-status ${type || ''}`;
+  }
+
+  cartPayBtn.addEventListener('click', async () => {
+    const name = document.getElementById('custName').value.trim();
+    const email = document.getElementById('custEmail').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+
+    if (!name || !email || !phone) {
+      showStatus('Please fill in name, email and phone before paying.', 'error');
+      return;
+    }
+    if (FUNCTIONS_BASE.includes('YOUR-PROJECT-REF')) {
+      showStatus('Backend not connected yet — see the setup guide to deploy the Edge Functions.', 'error');
+      return;
+    }
+
+    cartPayBtn.disabled = true;
+    cartPayBtn.textContent = 'Preparing payment…';
+    showStatus('', '');
+
+    try {
+      const res = await fetch(CREATE_ORDER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map(i => ({ id: i.id, name: i.name, qty: i.qty })),
+          customer: { name, email, phone }
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not create order');
+
+      const options = {
+        key: data.key_id,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Maison & Bottega',
+        description: 'Pastry order',
+        order_id: data.order_id,
+        prefill: { name, email, contact: phone },
+        theme: { color: '#AD3A52' },
+        handler: async function (response) {
+          showStatus('Verifying payment…', '');
+          try {
+            const verifyRes = await fetch(VERIFY_PAYMENT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                db_order_id: data.db_order_id
+              })
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              showStatus('Order placed — merci & grazie! Check your email for confirmation.', 'success');
+              cart = [];
+              renderCart();
+            } else {
+              showStatus('Payment could not be verified. Please contact us with your payment ID.', 'error');
+            }
+          } catch (e) {
+            showStatus('Verification failed: ' + e.message, 'error');
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            cartPayBtn.disabled = false;
+            cartPayBtn.textContent = 'Pay & Place Order';
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+      cartPayBtn.textContent = 'Pay & Place Order';
+      cartPayBtn.disabled = false;
+
+    } catch (err) {
+      showStatus(err.message, 'error');
+      cartPayBtn.disabled = false;
+      cartPayBtn.textContent = 'Pay & Place Order';
+    }
+  });
+</script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>
