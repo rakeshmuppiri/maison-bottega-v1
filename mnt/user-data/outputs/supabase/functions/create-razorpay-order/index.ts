@@ -12,8 +12,8 @@ const RAZORPAY_KEY_ID = Deno.env.get("RAZORPAY_KEY_ID")!;
 const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET")!;
 // Using our own secret names (not the SUPABASE_ prefixed ones) because
 // auto-injection of those has been inconsistent across projects/key systems.
-const PROJECT_URL = Deno.env.get("https://xhdldiwvznjxkiedczun.supabase.co")!;
-const SERVICE_ROLE_KEY = Deno.env.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZGxkaXd2em5qeGtpZWRjenVuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTE0MDY4MiwiZXhwIjoyMTAwNzE2NjgyfQ.a1HnpxTUvhgFqNLdclRD6QGlXT1GQToR9Aki-bSDp5E")!;
+const PROJECT_URL = Deno.env.get("PROJECT_URL")!;
+const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY")!;
 
 
 // The menu lives here, server-side, so a modified client request can
