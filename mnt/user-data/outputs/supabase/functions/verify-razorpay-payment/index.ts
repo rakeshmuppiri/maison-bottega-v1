@@ -1,13 +1,13 @@
 // Deploy with: supabase functions deploy verify-razorpay-payment --no-verify-jwt
 //
-// Required secret: RAZORPAY_KEY_SECRET (same one used in create-razorpay-order)
+// Required secrets: RAZORPAY_KEY_SECRET, PROJECT_URL, SERVICE_ROLE_KEY
+// (same values used in create-razorpay-order)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RAZORPAY_KEY_SECRET = Deno.env.get("RAZORPAY_KEY_SECRET")!;
-const SUPABASE_URL = Deno.env.get("https://xhdldiwvznjxkiedczun.supabase.co")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("sb_secret_058iYozLD09Ox4OD2IpdBg_A8jpJXmI")!;
-
+const PROJECT_URL = Deno.env.get("https://xhdldiwvznjxkiedczun.supabase.co")!;
+const SERVICE_ROLE_KEY = Deno.env.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZGxkaXd2em5qeGtpZWRjenVuIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTE0MDY4MiwiZXhwIjoyMTAwNzE2NjgyfQ.a1HnpxTUvhgFqNLdclRD6QGlXT1GQToR9Aki-bSDp5E")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*", // tighten to your GitHub Pages origin once live
@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const expected = await hmacHex(RAZORPAY_KEY_SECRET, `${razorpay_order_id}|${razorpay_payment_id}`);
     const valid = expected === razorpay_signature;
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
     await supabase
       .from("orders")
       .update({
