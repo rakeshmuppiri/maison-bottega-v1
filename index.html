@@ -495,6 +495,7 @@
   .cart-close:hover{background:var(--cream-deep);}
 
   .cart-body{flex:1; overflow-y:auto; padding:1.4rem 1.8rem;}
+  #cartMainView{flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0;}
   .cart-empty{color:var(--ink-soft); font-size:0.92rem; padding:2rem 0; text-align:center;}
 
   .cart-item{
@@ -566,6 +567,56 @@
   }
   .cart-status.error{color:var(--framboise);}
   .cart-status.success{color:var(--pistachio-deep);}
+
+  .drawer-hidden{display:none !important;}
+
+  .cart-confirm{
+    flex:1; overflow-y:auto; min-height:0;
+    padding:2.6rem 1.8rem 1rem;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+  }
+  .confirm-check{
+    width:52px; height:52px; border-radius:50%;
+    border:1.5px solid var(--pistachio-deep);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--pistachio-deep);
+    margin-bottom:1.1rem;
+    animation:confirmPop .5s cubic-bezier(.2,.8,.25,1.35);
+  }
+  @keyframes confirmPop{
+    0%{ transform:scale(0.3); opacity:0; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .confirm-number{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500;
+    font-size:1.9rem;
+    margin:0.7rem 0 1.7rem;
+    padding:0.55rem 1.3rem;
+    border:1px dashed var(--framboise);
+    border-radius:999px;
+    color:var(--framboise);
+    letter-spacing:0.01em;
+  }
+  .confirm-items{ width:100%; text-align:left; }
+  .confirm-item-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:0.7rem 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .confirm-item-row .ci-name{font-family:'Fraunces', serif; font-style:italic; font-size:1rem;}
+  .confirm-item-row .ci-qty{color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:0.76rem; white-space:nowrap; margin-left:1rem;}
+  .confirm-total{
+    display:flex; justify-content:space-between; width:100%;
+    font-family:'Fraunces', serif; font-size:1.15rem;
+    padding-top:0.9rem; margin-top:0.3rem;
+    border-top:1px solid var(--ink);
+  }
+  .confirm-note{
+    margin-top:1.5rem; font-size:0.78rem; color:var(--ink-soft); line-height:1.6;
+  }
+  .continue-btn{background:none; color:var(--ink); border:1px solid var(--ink);}
+  .continue-btn:hover{background:var(--ink); color:var(--cream);}
 </style>
 </head>
 <body>
@@ -610,22 +661,39 @@
     <button class="cart-close" id="cartClose" aria-label="Close cart">✕</button>
   </div>
 
-  <div class="cart-body" id="cartBody">
-    <p class="cart-empty" id="cartEmpty">Nothing in the box yet — add a pastry or six.</p>
-    <div class="cart-items" id="cartItems"></div>
+  <div id="cartMainView">
+    <div class="cart-body" id="cartBody">
+      <p class="cart-empty" id="cartEmpty">Nothing in the box yet — add a pastry or six.</p>
+      <div class="cart-items" id="cartItems"></div>
+    </div>
+
+    <div class="cart-form" id="cartForm">
+      <div class="eyebrow" style="margin-bottom:0.9rem;">Delivery details</div>
+      <input type="text" id="custName" class="cart-input" placeholder="Full name" autocomplete="name">
+      <input type="email" id="custEmail" class="cart-input" placeholder="Email" autocomplete="email">
+      <input type="tel" id="custPhone" class="cart-input" placeholder="Phone (for delivery updates)" autocomplete="tel">
+    </div>
   </div>
 
-  <div class="cart-form" id="cartForm">
-    <div class="eyebrow" style="margin-bottom:0.9rem;">Delivery details</div>
-    <input type="text" id="custName" class="cart-input" placeholder="Full name" autocomplete="name">
-    <input type="email" id="custEmail" class="cart-input" placeholder="Email" autocomplete="email">
-    <input type="tel" id="custPhone" class="cart-input" placeholder="Phone (for delivery updates)" autocomplete="tel">
+  <div class="cart-confirm drawer-hidden" id="cartConfirmView">
+    <div class="confirm-check">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <div class="eyebrow">Order Confirmed</div>
+    <div class="confirm-number" id="confirmNumber">MB-0000000</div>
+    <div class="confirm-items" id="confirmItems"></div>
+    <div class="confirm-total"><span>Total paid</span><span id="confirmTotal" class="mono">₹0</span></div>
+    <p class="confirm-note">A confirmation email is on its way to <span id="confirmEmail" class="mono"></span>.</p>
   </div>
 
-  <div class="cart-footer">
+  <div class="cart-footer" id="cartFooterMain">
     <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal" class="mono">₹0</span></div>
     <button class="cart-pay-btn" id="cartPayBtn" disabled>Pay &amp; Place Order</button>
     <p class="cart-note">Payments handled by Razorpay. Card and UPI details never touch this site.</p>
+  </div>
+
+  <div class="cart-footer drawer-hidden" id="cartFooterConfirm">
+    <button class="cart-pay-btn continue-btn" id="continueBtn">Continue Browsing</button>
   </div>
 </aside>
 
@@ -940,6 +1008,46 @@
   const cartEmptyEl = document.getElementById('cartEmpty');
   const cartSubtotalEl = document.getElementById('cartSubtotal');
   const cartPayBtn = document.getElementById('cartPayBtn');
+  const cartMainView = document.getElementById('cartMainView');
+  const cartConfirmView = document.getElementById('cartConfirmView');
+  const cartFooterMain = document.getElementById('cartFooterMain');
+  const cartFooterConfirm = document.getElementById('cartFooterConfirm');
+  const continueBtn = document.getElementById('continueBtn');
+  const confirmNumber = document.getElementById('confirmNumber');
+  const confirmItems = document.getElementById('confirmItems');
+  const confirmTotal = document.getElementById('confirmTotal');
+  const confirmEmail = document.getElementById('confirmEmail');
+
+  function showOrderConfirmation(orderNumber, items, subtotal, email){
+    confirmNumber.textContent = orderNumber;
+    confirmTotal.textContent = `₹${subtotal}`;
+    confirmEmail.textContent = email;
+    confirmItems.innerHTML = '';
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'confirm-item-row';
+      row.innerHTML = `
+        <span class="ci-name">${item.name}</span>
+        <span class="ci-qty">×${item.qty} · ₹${item.price * item.qty}</span>`;
+      confirmItems.appendChild(row);
+    });
+    cartMainView.classList.add('drawer-hidden');
+    cartFooterMain.classList.add('drawer-hidden');
+    cartConfirmView.classList.remove('drawer-hidden');
+    cartFooterConfirm.classList.remove('drawer-hidden');
+  }
+
+  function resetToCartView(){
+    cartConfirmView.classList.add('drawer-hidden');
+    cartFooterConfirm.classList.add('drawer-hidden');
+    cartMainView.classList.remove('drawer-hidden');
+    cartFooterMain.classList.remove('drawer-hidden');
+  }
+
+  continueBtn.addEventListener('click', () => {
+    closeCart();
+    setTimeout(resetToCartView, 400); // wait for the close transition
+  });
 
   function openCart(){ cartOverlay.classList.add('open'); cartDrawer.classList.add('open'); cartDrawer.setAttribute('aria-hidden','false'); }
   function closeCart(){ cartOverlay.classList.remove('open'); cartDrawer.classList.remove('open'); cartDrawer.setAttribute('aria-hidden','true'); }
@@ -1039,6 +1147,10 @@
     cartPayBtn.textContent = 'Preparing payment…';
     showStatus('', '');
 
+    // snapshot now — 'cart' gets cleared right after a successful payment
+    const orderedItems = cart.map(i => ({ ...i }));
+    const orderedSubtotal = orderedItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+
     try {
       const res = await fetch(CREATE_ORDER_URL, {
         method: 'POST',
@@ -1075,11 +1187,11 @@
             });
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
-
               const orderNumber = verifyData.order_number || data.order_number || '';
-              showStatus(`Order ${orderNumber} placed — merci & grazie! Check your email for confirmation.`, 'success');
               cart = [];
               renderCart();
+              showStatus('', '');
+              showOrderConfirmation(orderNumber, orderedItems, orderedSubtotal, email);
             } else {
               showStatus('Payment could not be verified. Please contact us with your payment ID.', 'error');
             }
