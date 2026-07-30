@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maison &amp; Bottega — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --cream:#F7F1E6; --cream-deep:#EFE6D4; --ink:#2A1D14; --ink-soft:#5A493B;
+    --pistachio:#77875A; --pistachio-deep:#57633F; --framboise:#AD3A52; --gold:#C79341;
+    --rule:rgba(42,29,20,0.14);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--cream); color:var(--ink); font-family:'Work Sans', sans-serif; line-height:1.5;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  /* ---------- LOGIN ---------- */
+  #loginScreen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem;
+  }
+  .login-card{
+    width:100%; max-width:360px; background:#fff; border:1px solid var(--rule);
+    padding:2.4rem 2rem;
+  }
+  .login-card .logo{font-family:'Fraunces', serif; font-size:1.3rem; margin-bottom:0.3rem;}
+  .login-card .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.16em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:1.8rem; display:block;
+  }
+  .field{
+    width:100%; border:1px solid var(--rule); background:var(--cream);
+    padding:0.75rem 0.9rem; margin-bottom:0.8rem; font-family:'Work Sans', sans-serif; font-size:0.92rem;
+  }
+  .field:focus{outline:none; border-color:var(--ink);}
+  .btn{
+    width:100%; padding:0.85rem; border:none; background:var(--ink); color:var(--cream);
+    font-family:'IBM Plex Mono', monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;
+    cursor:pointer; transition:background .2s ease;
+  }
+  .btn:hover{background:var(--framboise);}
+  .btn:disabled{opacity:0.5; cursor:not-allowed;}
+  .login-error{color:var(--framboise); font-size:0.8rem; margin-top:0.8rem; min-height:1.2em;}
+
+  /* ---------- DASHBOARD SHELL ---------- */
+  #dashboard{display:none;}
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.2rem 2rem; border-bottom:1px solid var(--rule); background:#fff;
+    position:sticky; top:0; z-index:10;
+  }
+  header .logo{font-family:'Fraunces', serif; font-size:1.15rem;}
+  header .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:0.62rem; letter-spacing:0.14em;
+    color:var(--ink-soft); text-transform:uppercase; margin-left:0.6rem;
+    border:1px solid var(--rule); padding:2px 7px; border-radius:999px;
+  }
+  #signOutBtn{
+    background:none; border:1px solid var(--rule); padding:0.5rem 1rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.08em;
+    text-transform:uppercase; cursor:pointer; color:var(--ink);
+  }
+  #signOutBtn:hover{background:var(--cream-deep);}
+
+  main{max-width:1100px; margin:0 auto; padding:2rem;}
+
+  /* ---------- STATS ---------- */
+  .stats{display:grid; grid-template-columns:repeat(4, 1fr); gap:1px; background:var(--rule); border:1px solid var(--rule); margin-bottom:2rem;}
+  .stat{background:#fff; padding:1.2rem 1.4rem;}
+  .stat .label{font-family:'IBM Plex Mono', monospace; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft);}
+  .stat .value{font-family:'Fraunces', serif; font-size:1.6rem; margin-top:0.3rem;}
+
+  /* ---------- FILTERS ---------- */
+  .toolbar{display:flex; gap:0.8rem; margin-bottom:1.2rem; flex-wrap:wrap;}
+  .toolbar input[type="text"]{
+    flex:1; min-width:220px; border:1px solid var(--rule); background:#fff;
+    padding:0.65rem 0.9rem; font-family:'Work Sans', sans-serif; font-size:0.88rem;
+  }
+  .status-filter{display:flex; gap:0.4rem; flex-wrap:wrap;}
+  .status-filter button{
+    border:1px solid var(--rule); background:#fff; padding:0.5rem 0.9rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.06em;
+    text-transform:uppercase; cursor:pointer; color:var(--ink-soft);
+  }
+  .status-filter button.active{background:var(--ink); color:var(--cream); border-color:var(--ink);}
+
+  /* ---------- ORDER LIST ---------- */
+  .order-card{background:#fff; border:1px solid var(--rule); margin-bottom:0.9rem; padding:1.3rem 1.5rem;}
+  .order-top{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:1rem;}
+  .order-number{font-family:'Fraunces', serif; font-style:italic; font-size:1.2rem;}
+  .order-meta{font-size:0.78rem; color:var(--ink-soft); margin-top:0.2rem;}
+  .order-right{display:flex; align-items:center; gap:0.8rem;}
+  .badge{
+    font-family:'IBM Plex Mono', monospace; font-size:0.65rem; letter-spacing:0.06em;
+    text-transform:uppercase; padding:0.3rem 0.7rem; border-radius:999px; white-space:nowrap;
+  }
+  .badge-pending{background:#eee; color:#666;}
+  .badge-paid{background:#e8eef7; color:#3a5ca8;}
+  .badge-preparing{background:#fbeecf; color:#8a6112;}
+  .badge-ready_for_pickup{background:#e6efe0; color:var(--pistachio-deep);}
+  .badge-completed{background:#dff0e2; color:#2f7a3e;}
+  .badge-cancelled{background:#f7e3e6; color:var(--framboise);}
+  .badge-failed{background:#f7e3e6; color:var(--framboise);}
+
+  .status-select{
+    border:1px solid var(--rule); background:var(--cream); padding:0.4rem 0.6rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; text-transform:uppercase;
+  }
+
+  .order-items{margin-top:0.9rem; font-size:0.86rem;}
+  .order-items div{display:flex; justify-content:space-between; padding:0.35rem 0; border-bottom:1px solid var(--rule);}
+  .order-items div:last-child{border-bottom:none;}
+  .order-total{display:flex; justify-content:space-between; margin-top:0.6rem; font-family:'Fraunces', serif; font-size:1rem;}
+
+  .order-footnote{margin-top:0.6rem; font-size:0.72rem; color:var(--ink-soft);}
+  .order-footnote.refund{color:var(--framboise);}
+
+  #ordersEmpty{text-align:center; color:var(--ink-soft); padding:3rem 0;}
+  .row-error{color:var(--framboise); font-size:0.75rem; margin-top:0.5rem;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <form class="login-card" id="loginForm">
+    <div class="logo">Maison &amp; Bottega</div>
+    <span class="eyebrow">Admin Sign In</span>
+    <input type="email" id="loginEmail" class="field" placeholder="Email" autocomplete="username" required>
+    <input type="password" id="loginPassword" class="field" placeholder="Password" autocomplete="current-password" required>
+    <button type="submit" class="btn" id="loginBtn">Sign In</button>
+    <div class="login-error" id="loginError"></div>
+  </form>
+</div>
+
+<div id="dashboard">
+  <header>
+    <div><span class="logo">Maison &amp; Bottega</span><span class="tag">Admin</span></div>
+    <button id="signOutBtn">Sign Out</button>
+  </header>
+
+  <main>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="label">Orders Today</div><div class="value" id="statOrdersToday">0</div></div>
+      <div class="stat"><div class="label">Revenue Today</div><div class="value" id="statRevenueToday">₹0</div></div>
+      <div class="stat"><div class="label">Needs Attention</div><div class="value" id="statPending">0</div></div>
+      <div class="stat"><div class="label">Ready for Pickup</div><div class="value" id="statReady">0</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Search by order number, name, or email…">
+    </div>
+    <div class="status-filter" id="statusFilter">
+      <button data-status="all" class="active">All</button>
+      <button data-status="pending">Pending</button>
+      <button data-status="paid">Paid</button>
+      <button data-status="preparing">Preparing</button>
+      <button data-status="ready_for_pickup">Ready</button>
+      <button data-status="completed">Completed</button>
+      <button data-status="cancelled">Cancelled</button>
+    </div>
+
+    <div id="ordersList" style="margin-top:1.4rem;"></div>
+    <p id="ordersEmpty" style="display:none;">No orders match this view.</p>
+  </main>
+</div>
+
+<script>
+  /* =========================================================
+     CONFIG — same project as your main site's checkout.
+     ========================================================= */
+  const SUPABASE_URL = "https://xhdldiwvznjxkiedczun.supabase.co";       // TODO
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZGxkaXd2em5qeGtpZWRjenVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDA2ODIsImV4cCI6MjEwMDcxNjY4Mn0.YnQiI0qnrUG_CoS51_NNzikUxZhtSx1g_NQTqpy1Jqo";                   // TODO (safe to expose — RLS protects the data)
+  const FUNCTIONS_BASE = "https://xhdldiwvznjxkiedczun.functions.supabase.co"; // TODO
+  const UPDATE_STATUS_URL = `${FUNCTIONS_BASE}/admin-update-order-status`;
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const STATUS_LABELS = {
+    pending: "Pending", paid: "Paid", preparing: "Preparing",
+    ready_for_pickup: "Ready for Pickup", completed: "Completed",
+    cancelled: "Cancelled", failed: "Failed",
+  };
+  const STATUS_OPTIONS = Object.keys(STATUS_LABELS);
+
+  let allOrders = [];
+  let activeStatusFilter = "all";
+
+  /* ---------- AUTH ---------- */
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+
+  async function checkSession(){
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) { showDashboard(); } else { showLogin(); }
+  }
+
+  function showLogin(){ loginScreen.style.display = 'flex'; dashboard.style.display = 'none'; }
+  function showDashboard(){ loginScreen.style.display = 'none'; dashboard.style.display = 'block'; loadOrders(); subscribeToLiveUpdates(); }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Sign In';
+    if (error) { loginError.textContent = error.message; return; }
+    showDashboard();
+  });
+
+  document.getElementById('signOutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    showLogin();
+  });
+
+  /* ---------- LOAD + RENDER ORDERS ---------- */
+  async function loadOrders(){
+    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+    allOrders = data || [];
+    renderStats();
+    renderOrders();
+  }
+
+  function subscribeToLiveUpdates(){
+    // Requires Realtime enabled for the 'orders' table (Database -> Replication).
+    sb.channel('orders-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => loadOrders())
+      .subscribe();
+  }
+
+  function orderNumber(o){ return `MB-${String(o.order_seq).padStart(7, '0')}`; }
+
+  function renderStats(){
+    const todayStr = new Date().toDateString();
+    const todays = allOrders.filter(o => new Date(o.created_at).toDateString() === todayStr);
+    const revenueToday = todays.filter(o => ['paid','preparing','ready_for_pickup','completed'].includes(o.status))
+      .reduce((sum, o) => sum + Number(o.subtotal), 0);
+    const needsAttention = allOrders.filter(o => ['paid','preparing'].includes(o.status)).length;
+    const ready = allOrders.filter(o => o.status === 'ready_for_pickup').length;
+
+    document.getElementById('statOrdersToday').textContent = todays.length;
+    document.getElementById('statRevenueToday').textContent = `₹${revenueToday}`;
+    document.getElementById('statPending').textContent = needsAttention;
+    document.getElementById('statReady').textContent = ready;
+  }
+
+  function renderOrders(){
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    let filtered = allOrders;
+    if (activeStatusFilter !== 'all') filtered = filtered.filter(o => o.status === activeStatusFilter);
+    if (search) {
+      filtered = filtered.filter(o =>
+        orderNumber(o).toLowerCase().includes(search) ||
+        (o.customer_name || '').toLowerCase().includes(search) ||
+        (o.customer_email || '').toLowerCase().includes(search)
+      );
+    }
+
+    const list = document.getElementById('ordersList');
+    const empty = document.getElementById('ordersEmpty');
+    list.innerHTML = '';
+
+    if (filtered.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    filtered.forEach(o => list.appendChild(renderOrderCard(o)));
+  }
+
+  function renderOrderCard(o){
+    const card = document.createElement('div');
+    card.className = 'order-card';
+
+    const when = new Date(o.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+    const itemsHtml = (o.items || []).map(i => `
+      <div><span>${i.name} × ${i.qty}</span><span class="mono">₹${i.price * i.qty}</span></div>
+    `).join('');
+
+    const optionsHtml = STATUS_OPTIONS.map(s =>
+      `<option value="${s}" ${s === o.status ? 'selected' : ''}>${STATUS_LABELS[s]}</option>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="order-top">
+        <div>
+          <div class="order-number">${orderNumber(o)}</div>
+          <div class="order-meta">${when} · ${o.customer_name || '—'} · ${o.customer_email || '—'} · ${o.customer_phone || '—'}</div>
+        </div>
+        <div class="order-right">
+          <span class="badge badge-${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+          <select class="status-select" data-id="${o.id}">${optionsHtml}</select>
+        </div>
+      </div>
+      <div class="order-items">${itemsHtml}</div>
+      <div class="order-total"><span>Subtotal</span><span class="mono">₹${o.subtotal}</span></div>
+      ${o.razorpay_refund_id ? `<div class="order-footnote refund">Refunded — Razorpay refund ${o.razorpay_refund_id}</div>` : ''}
+      <div class="row-error" id="err-${o.id}"></div>
+    `;
+
+    const select = card.querySelector('.status-select');
+    select.addEventListener('change', async (e) => {
+      const newStatus = e.target.value;
+      const errEl = card.querySelector(`#err-${o.id}`);
+      errEl.textContent = '';
+
+      if (newStatus === 'cancelled') {
+        const ok = confirm(`Cancel ${orderNumber(o)}? If it was paid, this will automatically refund ₹${o.subtotal} to the customer via Razorpay.`);
+        if (!ok) { select.value = o.status; return; }
+      }
+
+      select.disabled = true;
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const res = await fetch(UPDATE_STATUS_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ db_order_id: o.id, new_status: newStatus }),
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Update failed');
+        await loadOrders();
+      } catch (err) {
+        errEl.textContent = err.message;
+        select.value = o.status;
+      } finally {
+        select.disabled = false;
+      }
+    });
+
+    return card;
+  }
+
+  document.getElementById('searchInput').addEventListener('input', renderOrders);
+  document.querySelectorAll('#statusFilter button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#statusFilter button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeStatusFilter = btn.dataset.status;
+      renderOrders();
+    });
+  });
+
+  checkSession();
+</script>
+
+</body>
+</html>
