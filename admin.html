@@ -120,6 +120,40 @@
 
   #ordersEmpty{text-align:center; color:var(--ink-soft); padding:3rem 0;}
   .row-error{color:var(--framboise); font-size:0.75rem; margin-top:0.5rem;}
+
+  /* ---------- PAGINATION ---------- */
+  .pagination{
+    display:flex; align-items:center; justify-content:center; gap:1.2rem;
+    margin-top:1.6rem; padding-top:1.6rem;
+  }
+  .pagination button{
+    border:1px solid var(--rule); background:#fff; padding:0.55rem 1.1rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.06em;
+    text-transform:uppercase; cursor:pointer; color:var(--ink);
+  }
+  .pagination button:hover:not(:disabled){background:var(--cream-deep);}
+  .pagination button:disabled{opacity:0.35; cursor:not-allowed;}
+  .pagination .page-info{font-family:'IBM Plex Mono', monospace; font-size:0.75rem; color:var(--ink-soft);}
+
+  /* ---------- PACKING SLIP BUTTON ---------- */
+  .slip-btn{
+    border:1px solid var(--rule); background:none; padding:0.4rem 0.7rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.65rem; letter-spacing:0.04em;
+    text-transform:uppercase; cursor:pointer; color:var(--ink-soft);
+  }
+  .slip-btn:hover{background:var(--cream-deep); color:var(--ink);}
+
+  /* ---------- PRINT: PACKING SLIP ---------- */
+  #packingSlip{display:none;}
+  @media print{
+    body *{ visibility:hidden; }
+    #packingSlip, #packingSlip *{ visibility:visible; }
+    #packingSlip{
+      display:block !important;
+      position:absolute; top:0; left:0; width:100%;
+      padding:2.4rem;
+    }
+  }
 </style>
 </head>
 <body>
@@ -164,16 +198,24 @@
 
     <div id="ordersList" style="margin-top:1.4rem;"></div>
     <p id="ordersEmpty" style="display:none;">No orders match this view.</p>
+
+    <div class="pagination" id="pagination">
+      <button id="prevPageBtn">← Prev</button>
+      <span class="page-info" id="pageInfo">Page 1 of 1</span>
+      <button id="nextPageBtn">Next →</button>
+    </div>
   </main>
 </div>
+
+<div id="packingSlip"></div>
 
 <script>
   /* =========================================================
      CONFIG — same project as your main site's checkout.
      ========================================================= */
-  const SUPABASE_URL = "https://xhdldiwvznjxkiedczun.supabase.co";       // TODO
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoZGxkaXd2em5qeGtpZWRjenVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDA2ODIsImV4cCI6MjEwMDcxNjY4Mn0.YnQiI0qnrUG_CoS51_NNzikUxZhtSx1g_NQTqpy1Jqo";                   // TODO (safe to expose — RLS protects the data)
-  const FUNCTIONS_BASE = "https://xhdldiwvznjxkiedczun.functions.supabase.co"; // TODO
+  const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";       // TODO
+  const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";                   // TODO (safe to expose — RLS protects the data)
+  const FUNCTIONS_BASE = "https://YOUR-PROJECT-REF.functions.supabase.co"; // TODO
   const UPDATE_STATUS_URL = `${FUNCTIONS_BASE}/admin-update-order-status`;
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -187,6 +229,10 @@
 
   let allOrders = [];
   let activeStatusFilter = "all";
+  let currentPage = 1;
+  const PAGE_SIZE = 20;
+  let totalCount = 0;
+  let searchDebounce = null;
 
   /* ---------- AUTH ---------- */
   const loginScreen = document.getElementById('loginScreen');
@@ -201,7 +247,13 @@
   }
 
   function showLogin(){ loginScreen.style.display = 'flex'; dashboard.style.display = 'none'; }
-  function showDashboard(){ loginScreen.style.display = 'none'; dashboard.style.display = 'block'; loadOrders(); subscribeToLiveUpdates(); }
+  function showDashboard(){
+    loginScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    loadStats();
+    loadOrders();
+    subscribeToLiveUpdates();
+  }
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -218,35 +270,21 @@
   });
 
   document.getElementById('signOutBtn').addEventListener('click', async () => {
+    if (realtimeChannel) { sb.removeChannel(realtimeChannel); realtimeChannel = null; }
     await sb.auth.signOut();
     showLogin();
   });
 
-  /* ---------- LOAD + RENDER ORDERS ---------- */
-  async function loadOrders(){
-    const { data, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+  /* ---------- LOAD STATS (unpaginated, minimal columns) ---------- */
+  async function loadStats(){
+    const { data, error } = await sb.from('orders').select('status, subtotal, created_at');
     if (error) { console.error(error); return; }
-    allOrders = data || [];
-    renderStats();
-    renderOrders();
-  }
-
-  function subscribeToLiveUpdates(){
-    // Requires Realtime enabled for the 'orders' table (Database -> Replication).
-    sb.channel('orders-admin')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => loadOrders())
-      .subscribe();
-  }
-
-  function orderNumber(o){ return `MB-${String(o.order_seq).padStart(7, '0')}`; }
-
-  function renderStats(){
     const todayStr = new Date().toDateString();
-    const todays = allOrders.filter(o => new Date(o.created_at).toDateString() === todayStr);
+    const todays = data.filter(o => new Date(o.created_at).toDateString() === todayStr);
     const revenueToday = todays.filter(o => ['paid','preparing','ready_for_pickup','completed'].includes(o.status))
       .reduce((sum, o) => sum + Number(o.subtotal), 0);
-    const needsAttention = allOrders.filter(o => ['paid','preparing'].includes(o.status)).length;
-    const ready = allOrders.filter(o => o.status === 'ready_for_pickup').length;
+    const needsAttention = data.filter(o => ['paid','preparing'].includes(o.status)).length;
+    const ready = data.filter(o => o.status === 'ready_for_pickup').length;
 
     document.getElementById('statOrdersToday').textContent = todays.length;
     document.getElementById('statRevenueToday').textContent = `₹${revenueToday}`;
@@ -254,27 +292,84 @@
     document.getElementById('statReady').textContent = ready;
   }
 
-  function renderOrders(){
-    const search = document.getElementById('searchInput').value.trim().toLowerCase();
-    let filtered = allOrders;
-    if (activeStatusFilter !== 'all') filtered = filtered.filter(o => o.status === activeStatusFilter);
+  /* ---------- LOAD + RENDER ORDERS (paginated, filtered server-side) ---------- */
+  async function loadOrders(){
+    const search = document.getElementById('searchInput').value.trim();
+
+    let query = sb.from('orders').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+
+    if (activeStatusFilter !== 'all') query = query.eq('status', activeStatusFilter);
+
     if (search) {
-      filtered = filtered.filter(o =>
-        orderNumber(o).toLowerCase().includes(search) ||
-        (o.customer_name || '').toLowerCase().includes(search) ||
-        (o.customer_email || '').toLowerCase().includes(search)
-      );
+      const digits = search.match(/(\d+)/);
+      const escaped = search.replace(/[%,()]/g, ''); // keep the OR filter syntax safe
+      if (digits) {
+        query = query.or(`customer_name.ilike.%${escaped}%,customer_email.ilike.%${escaped}%,order_seq.eq.${parseInt(digits[1], 10)}`);
+      } else {
+        query = query.or(`customer_name.ilike.%${escaped}%,customer_email.ilike.%${escaped}%`);
+      }
     }
 
+    const from = (currentPage - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+    if (error) {
+      console.error(error);
+      document.getElementById('ordersEmpty').textContent = `Couldn't load orders: ${error.message}`;
+      document.getElementById('ordersEmpty').style.display = 'block';
+      document.getElementById('ordersList').innerHTML = '';
+      return;
+    }
+    allOrders = data || [];
+    totalCount = count || 0;
+    renderOrders();
+    renderPagination();
+  }
+
+  let realtimeChannel = null;
+
+  function subscribeToLiveUpdates(){
+    if (realtimeChannel) return; // already subscribed — avoid the duplicate-subscribe error
+    // Requires Realtime enabled for the 'orders' table:
+    //   alter publication supabase_realtime add table orders;
+    realtimeChannel = sb.channel('orders-admin')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => { loadStats(); loadOrders(); })
+      .subscribe();
+  }
+
+  function orderNumber(o){ return `MB-${String(o.order_seq).padStart(7, '0')}`; }
+
+  function renderOrders(){
     const list = document.getElementById('ordersList');
     const empty = document.getElementById('ordersEmpty');
     list.innerHTML = '';
 
-    if (filtered.length === 0) { empty.style.display = 'block'; return; }
+    if (allOrders.length === 0) {
+      empty.textContent = 'No orders match this view.';
+      empty.style.display = 'block';
+      return;
+    }
     empty.style.display = 'none';
 
-    filtered.forEach(o => list.appendChild(renderOrderCard(o)));
+    allOrders.forEach(o => list.appendChild(renderOrderCard(o)));
   }
+
+  function renderPagination(){
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages} · ${totalCount} order${totalCount === 1 ? '' : 's'}`;
+    document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+    document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+  }
+
+  document.getElementById('prevPageBtn').addEventListener('click', () => {
+    if (currentPage > 1) { currentPage -= 1; loadOrders(); }
+  });
+  document.getElementById('nextPageBtn').addEventListener('click', () => {
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+    if (currentPage < totalPages) { currentPage += 1; loadOrders(); }
+  });
 
   function renderOrderCard(o){
     const card = document.createElement('div');
@@ -297,6 +392,7 @@
         </div>
         <div class="order-right">
           <span class="badge badge-${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+          <button class="slip-btn" type="button">Packing Slip</button>
           <select class="status-select" data-id="${o.id}">${optionsHtml}</select>
         </div>
       </div>
@@ -305,6 +401,8 @@
       ${o.razorpay_refund_id ? `<div class="order-footnote refund">Refunded — Razorpay refund ${o.razorpay_refund_id}</div>` : ''}
       <div class="row-error" id="err-${o.id}"></div>
     `;
+
+    card.querySelector('.slip-btn').addEventListener('click', () => printPackingSlip(o));
 
     const select = card.querySelector('.status-select');
     select.addEventListener('change', async (e) => {
@@ -330,6 +428,7 @@
         });
         const result = await res.json();
         if (!res.ok) throw new Error(result.error || 'Update failed');
+        await loadStats();
         await loadOrders();
       } catch (err) {
         errEl.textContent = err.message;
@@ -342,13 +441,43 @@
     return card;
   }
 
-  document.getElementById('searchInput').addEventListener('input', renderOrders);
+  /* ---------- PACKING SLIP ---------- */
+  function printPackingSlip(o){
+    const totalItems = (o.items || []).reduce((sum, i) => sum + i.qty, 0);
+    const itemsHtml = (o.items || []).map(i => `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #ccc; font-size:16px;">
+        <span>☐&nbsp;&nbsp;${i.name}</span>
+        <span style="font-family:monospace;">× ${i.qty}</span>
+      </div>`).join('');
+
+    document.getElementById('packingSlip').innerHTML = `
+      <div style="font-family:Georgia, serif; max-width:480px;">
+        <h1 style="font-size:22px; margin-bottom:2px;">Maison &amp; Bottega</h1>
+        <p style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#AD3A52; margin-bottom:22px;">Packing Slip</p>
+        <p style="font-family:monospace; font-size:22px; border:1px dashed #AD3A52; display:inline-block; padding:6px 16px; border-radius:999px; margin-bottom:18px;">${orderNumber(o)}</p>
+        <p style="font-size:13px; color:#555; margin-bottom:14px;">${new Date(o.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+        <p style="font-size:15px; margin-bottom:20px;"><strong>${o.customer_name || '—'}</strong><br>${o.customer_phone || '—'}</p>
+        <div>${itemsHtml}</div>
+        <p style="margin-top:18px; font-size:13px; color:#555;">Total items: ${totalItems}</p>
+      </div>
+    `;
+    window.print();
+  }
+  window.addEventListener('afterprint', () => {
+    document.getElementById('packingSlip').innerHTML = '';
+  });
+
+  document.getElementById('searchInput').addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => { currentPage = 1; loadOrders(); }, 350);
+  });
   document.querySelectorAll('#statusFilter button').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#statusFilter button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeStatusFilter = btn.dataset.status;
-      renderOrders();
+      currentPage = 1;
+      loadOrders();
     });
   });
 
