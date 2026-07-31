@@ -6,7 +6,7 @@
 <title>Maison &amp; Bottega — French Patisserie × Italian Pasticceria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Playfair+Display:wght@500;600;700&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --cream:#F7F1E6;
@@ -453,15 +453,17 @@
   }
   .croissant-hero.in-view .croissant-hero-content{opacity:1; transform:translateY(0);}
 
-  .croissant-logo-mark{display:flex; flex-direction:column; margin-bottom:2.6rem;}
-  .croissant-logo-mark .word{
-    font-family:'Fraunces', serif; font-weight:500; font-size:1.3rem;
-    letter-spacing:0.08em; text-transform:uppercase; line-height:1.25;
+  .croissant-hero-content .signature-eyebrow{
+    margin-top:0; color:var(--gold);
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:0.78rem;
   }
-  .croissant-logo-mark svg{margin-top:0.6rem; color:var(--pistachio-deep);}
-
-  .croissant-hero-content .signature-eyebrow{margin-top:0; color:var(--gold);}
   .croissant-hero-content .signature-title{
+    font-family:'Playfair Display', serif !important;
+    font-weight:600 !important;
+    font-style:normal !important;
+    letter-spacing:0;
     font-size:clamp(2.6rem, 5.5vw, 4rem);
     margin:0.6rem 0 0;
   }
@@ -470,7 +472,12 @@
     max-width:24rem; color:var(--ink-soft); font-weight:300; font-size:1.02rem;
   }
   .croissant-hero-content .price-row{margin-top:1.8rem;}
-  .croissant-hero-content .discover-link{margin-top:1.1rem;}
+  .croissant-hero-content .discover-link{
+    margin-top:1.1rem;
+    font-family:'Work Sans', sans-serif;
+    font-weight:500;
+    letter-spacing:0.14em;
+  }
 
   @media (max-width: 860px){
     .croissant-hero{height:auto; min-height:0;}
@@ -845,15 +852,6 @@
   <img src="images/croissant.jpg" alt="Freshly baked croissant on a speckled ceramic plate, olive branch and folded linen nearby" class="croissant-hero-photo">
   <div class="croissant-hero-scrim"></div>
   <div class="croissant-hero-content">
-    <div class="croissant-logo-mark">
-      <span class="word">Maison</span>
-      <span class="word">Bottega</span>
-      <svg width="34" height="14" viewBox="0 0 34 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M2 7h30"/>
-        <path d="M9 7c1.5-2 3.5-3 5-1M15 7c1.5-2 3.5-3 5-1M21 7c1.5-2 3.5-3 5-1"/>
-      </svg>
-    </div>
-
     <span class="signature-eyebrow">Signature</span>
     <h3 class="signature-title">The Croissant</h3>
     <div class="pastry-divider"></div>
