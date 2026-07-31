@@ -389,6 +389,99 @@
   }
   .pastry-text .fact span{display:block; color:var(--ink); margin-top:0.2rem; font-size:0.82rem;}
 
+  /* ---------- SIGNATURE FEATURE STYLE (currently used by: Croissant) ---------- */
+  .signature-eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-top:0.4rem;
+    display:block;
+  }
+  .signature-title{
+    font-family:'Fraunces', serif !important;
+    font-weight:600 !important;
+    font-style:normal !important;
+    letter-spacing:-0.01em;
+  }
+  .discover-link{
+    display:inline-flex; align-items:center; gap:0.5rem;
+    margin-top:1.3rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--gold);
+    border-bottom:1px solid var(--gold);
+    padding-bottom:3px;
+    transition:gap .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .discover-link:hover{gap:0.8rem; color:var(--framboise); border-color:var(--framboise);}
+
+  /* ---------- CROISSANT HERO (full-bleed, matches reference composition) ---------- */
+  .croissant-hero{
+    position:relative;
+    min-height:640px;
+    height:82vh;
+    max-height:820px;
+    overflow:hidden;
+    border-top:1px solid var(--rule);
+  }
+  .croissant-hero-photo{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:68% 55%;
+    opacity:0;
+    transition:opacity 1.1s ease;
+  }
+  .croissant-hero.in-view .croissant-hero-photo{opacity:1;}
+  .croissant-hero-scrim{
+    position:absolute; inset:0;
+    background:linear-gradient(100deg, var(--cream) 0%, var(--cream) 34%, rgba(247,241,230,0.72) 50%, rgba(247,241,230,0.1) 68%, transparent 80%);
+  }
+  .croissant-hero-content{
+    position:relative; z-index:2;
+    height:100%;
+    display:flex; flex-direction:column; justify-content:center;
+    max-width:460px;
+    padding:3rem 3rem 3rem 6vw;
+    opacity:0;
+    transform:translateY(14px);
+    transition:opacity .9s ease .2s, transform .9s cubic-bezier(.2,.7,.2,1) .2s;
+  }
+  .croissant-hero.in-view .croissant-hero-content{opacity:1; transform:translateY(0);}
+
+  .croissant-logo-mark{display:flex; flex-direction:column; margin-bottom:2.6rem;}
+  .croissant-logo-mark .word{
+    font-family:'Fraunces', serif; font-weight:500; font-size:1.3rem;
+    letter-spacing:0.08em; text-transform:uppercase; line-height:1.25;
+  }
+  .croissant-logo-mark svg{margin-top:0.6rem; color:var(--pistachio-deep);}
+
+  .croissant-hero-content .signature-eyebrow{margin-top:0; color:var(--gold);}
+  .croissant-hero-content .signature-title{
+    font-size:clamp(2.6rem, 5.5vw, 4rem);
+    margin:0.6rem 0 0;
+  }
+  .croissant-hero-content .pastry-divider{margin:1.1rem 0 1.2rem;}
+  .croissant-hero-content .note{
+    max-width:24rem; color:var(--ink-soft); font-weight:300; font-size:1.02rem;
+  }
+  .croissant-hero-content .price-row{margin-top:1.8rem;}
+  .croissant-hero-content .discover-link{margin-top:1.1rem;}
+
+  @media (max-width: 860px){
+    .croissant-hero{height:auto; min-height:0;}
+    .croissant-hero-photo{position:static; width:100%; height:340px; opacity:1;}
+    .croissant-hero-scrim{display:none;}
+    .croissant-hero-content{
+      max-width:none; padding:2.4rem 6vw 3rem;
+      opacity:1; transform:none;
+    }
+  }
+
   .price-row{
     display:flex; align-items:center; gap:1.2rem;
     margin-top:1.6rem;
@@ -748,21 +841,31 @@
 </section>
 
 <!-- CROISSANT -->
-<div class="pastry" data-pastry data-id="croissant">
-  <div class="pastry-art">
-    <img src="images/croissant.jpg" alt="Freshly baked croissant on a speckled ceramic plate" class="pastry-photo">
-  </div>
-  <div class="pastry-text">
-    <span class="stamp fr"><span class="stamp-dot"></span>France</span>
-    <h3>The Croissant</h3>
+<div class="pastry croissant-hero" data-pastry data-id="croissant">
+  <img src="images/croissant.jpg" alt="Freshly baked croissant on a speckled ceramic plate, olive branch and folded linen nearby" class="croissant-hero-photo">
+  <div class="croissant-hero-scrim"></div>
+  <div class="croissant-hero-content">
+    <div class="croissant-logo-mark">
+      <span class="word">Maison</span>
+      <span class="word">Bottega</span>
+      <svg width="34" height="14" viewBox="0 0 34 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M2 7h30"/>
+        <path d="M9 7c1.5-2 3.5-3 5-1M15 7c1.5-2 3.5-3 5-1M21 7c1.5-2 3.5-3 5-1"/>
+      </svg>
+    </div>
+
+    <span class="signature-eyebrow">Signature</span>
+    <h3 class="signature-title">The Croissant</h3>
     <div class="pastry-divider"></div>
-    <div class="origin mono">Viennoiserie · Laminated dough</div>
-    <p class="note">Twenty-seven layers of butter and dough, folded over three days, baked until the outside shatters and the inside pulls apart in ribbons. No filling. It doesn't need one.</p>
-    <div class="fact"><div>Butter<span>82% AOP</span></div><div>Proof<span>18 hours</span></div><div>Best eaten<span>Within the hour</span></div></div>
+
+    <p class="note">Buttery layers. Perfectly golden.<br>Made the traditional way, every day.</p>
+
     <div class="price-row">
       <span class="price mono">₹180</span>
       <button class="add-btn" data-add data-id="croissant" data-name="The Croissant" data-price="180">Add to cart</button>
     </div>
+
+    <a href="#" class="discover-link" id="discoverMoreLink">Discover More <span>→</span></a>
   </div>
 </div>
 
@@ -937,6 +1040,15 @@
     });
   }, { threshold: 0.3 });
   items.forEach(el => io.observe(el));
+
+  const discoverLink = document.getElementById('discoverMoreLink');
+  if (discoverLink) {
+    discoverLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nextPastry = discoverLink.closest('.pastry').nextElementSibling;
+      if (nextPastry) nextPastry.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 
   /* ---- custom cursor: dot snaps instantly, ring trails with easing ---- */
   if (window.matchMedia('(pointer: fine)').matches) {
