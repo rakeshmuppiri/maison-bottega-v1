@@ -334,6 +334,25 @@
   .pastry.in-view .pastry-art .fill-dot,
   .pastry.in-view .pastry-art .cocoa-dot{opacity:1;}
 
+  /* ---------- PHOTOGRAPHIC PASTRY IMAGE (currently used by: Croissant) ---------- */
+  .pastry-photo{
+    width:100%; max-width:420px;
+    aspect-ratio:3/2;
+    object-fit:cover;
+    border-radius:4px;
+    box-shadow:0 26px 55px rgba(42,29,20,0.22);
+    opacity:0;
+    transform:scale(0.94);
+    transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .pastry.in-view .pastry-photo{opacity:1; transform:scale(1);}
+  .pastry-divider{
+    width:46px; height:1px;
+    background:var(--ink);
+    opacity:0.5;
+    margin:1rem 0 1.2rem;
+  }
+
   .pastry-text{flex:1;}
   .stamp{
     display:inline-flex; align-items:center; gap:0.55rem;
@@ -730,18 +749,13 @@
 
 <!-- CROISSANT -->
 <div class="pastry" data-pastry data-id="croissant">
-  <div class="pastry-art fr">
-    <svg viewBox="0 0 300 260">
-      <path class="base-shape" fill="url(#croissantGrad)" d="M40 190 C 20 140, 60 60, 150 45 C 240 60, 280 140, 260 190 C 230 165, 205 195, 180 165 C 155 195, 130 165, 105 195 C 80 165, 65 195, 40 190 Z"/>
-      <path class="line-art" d="M85 165 C 115 130, 135 120, 150 118"/>
-      <path class="line-art" d="M110 185 C 145 145, 170 132, 195 130"/>
-      <path class="line-art" d="M150 45 C 160 75, 190 95, 225 115"/>
-      <circle class="fill-dot" cx="150" cy="45" r="3.5"/>
-    </svg>
+  <div class="pastry-art">
+    <img src="images/croissant.jpg" alt="Freshly baked croissant on a speckled ceramic plate" class="pastry-photo">
   </div>
   <div class="pastry-text">
     <span class="stamp fr"><span class="stamp-dot"></span>France</span>
     <h3>The Croissant</h3>
+    <div class="pastry-divider"></div>
     <div class="origin mono">Viennoiserie · Laminated dough</div>
     <p class="note">Twenty-seven layers of butter and dough, folded over three days, baked until the outside shatters and the inside pulls apart in ribbons. No filling. It doesn't need one.</p>
     <div class="fact"><div>Butter<span>82% AOP</span></div><div>Proof<span>18 hours</span></div><div>Best eaten<span>Within the hour</span></div></div>
