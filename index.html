@@ -432,21 +432,20 @@
     position:absolute; inset:0;
     width:100%; height:100%;
     object-fit:cover;
-    object-position:68% 55%;
+    object-position:55% 45%;
     opacity:0;
     transition:opacity 1.1s ease;
   }
   .croissant-hero.in-view .croissant-hero-photo{opacity:1;}
-  .croissant-hero-scrim{
-    position:absolute; inset:0;
-    background:linear-gradient(100deg, var(--cream) 0%, var(--cream) 34%, rgba(247,241,230,0.72) 50%, rgba(247,241,230,0.1) 68%, transparent 80%);
-  }
   .croissant-hero-content{
     position:relative; z-index:2;
     height:100%;
     display:flex; flex-direction:column; justify-content:center;
     max-width:460px;
-    padding:3rem 3rem 3rem 6vw;
+    padding:2.4rem 2.2rem;
+    margin-left:5vw;
+    background:rgba(247,241,230,0.86);
+    backdrop-filter:blur(6px);
     opacity:0;
     transform:translateY(14px);
     transition:opacity .9s ease .2s, transform .9s cubic-bezier(.2,.7,.2,1) .2s;
@@ -467,7 +466,11 @@
     font-size:clamp(2.6rem, 5.5vw, 4rem);
     margin:0.6rem 0 0;
   }
-  .croissant-hero-content .pastry-divider{margin:1.1rem 0 1.2rem;}
+  .croissant-hero-content .pastry-divider{
+    margin:1.1rem 0 1.2rem;
+    background:var(--gold);
+    opacity:1;
+  }
   .croissant-hero-content .note{
     max-width:24rem; color:var(--ink-soft); font-weight:300; font-size:1.02rem;
   }
@@ -482,9 +485,9 @@
   @media (max-width: 860px){
     .croissant-hero{height:auto; min-height:0;}
     .croissant-hero-photo{position:static; width:100%; height:340px; opacity:1;}
-    .croissant-hero-scrim{display:none;}
     .croissant-hero-content{
-      max-width:none; padding:2.4rem 6vw 3rem;
+      max-width:none; margin-left:0; padding:2.4rem 6vw 3rem;
+      background:var(--cream); backdrop-filter:none;
       opacity:1; transform:none;
     }
   }
@@ -850,7 +853,6 @@
 <!-- CROISSANT -->
 <div class="pastry croissant-hero" data-pastry data-id="croissant">
   <img src="images/croissant.jpg" alt="Freshly baked croissant on a speckled ceramic plate, olive branch and folded linen nearby" class="croissant-hero-photo">
-  <div class="croissant-hero-scrim"></div>
   <div class="croissant-hero-content">
     <span class="signature-eyebrow">Signature</span>
     <h3 class="signature-title">The Croissant</h3>
