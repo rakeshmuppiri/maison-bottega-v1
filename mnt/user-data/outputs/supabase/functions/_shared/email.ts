@@ -4,8 +4,11 @@
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "Maison & Bottega <onboarding@resend.dev>";
+// e.g. "https://yourusername.github.io/maison-bottega" or your custom domain — no trailing slash.
+// Used to build absolute image URLs, since emails can't load relative/local paths.
+const SITE_BASE_URL = (Deno.env.get("SITE_BASE_URL") ?? "").replace(/\/$/, "");
 
-export type OrderItem = { name: string; price: number; qty: number };
+export type OrderItem = { id: string; name: string; price: number; qty: number };
 
 export type EmailOrder = {
   order_number: string;
@@ -38,12 +41,22 @@ const COPY: Record<EmailKind, { eyebrow: string; heading: (o: EmailOrder) => str
 
 function buildOrderEmailHtml(kind: EmailKind, order: EmailOrder): string {
   const copy = COPY[kind];
-  const rows = order.items.map((i) => `
+  const showImages = SITE_BASE_URL.length > 0;
+
+  const rows = order.items.map((i) => {
+    const imageCell = showImages ? `
+      <td style="padding:10px 8px 10px 0; border-bottom:1px solid #e7ded0; width:52px;">
+        <img src="${SITE_BASE_URL}/images/${i.id}.jpg" width="48" height="48" alt="${i.name}"
+             style="width:48px; height:48px; object-fit:cover; border-radius:6px; display:block;" border="0">
+      </td>` : "";
+    return `
     <tr>
+      ${imageCell}
       <td style="padding:10px 0; border-bottom:1px solid #e7ded0; font-family:Georgia, serif; font-style:italic; color:#2A1D14;">${i.name}</td>
       <td style="padding:10px 0; border-bottom:1px solid #e7ded0; text-align:center; font-family:monospace; color:#5A493B;">×${i.qty}</td>
       <td style="padding:10px 0; border-bottom:1px solid #e7ded0; text-align:right; font-family:monospace; color:#2A1D14;">₹${i.price * i.qty}</td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 
   return `
   <div style="background:#F7F1E6; padding:40px 20px; font-family:Helvetica, Arial, sans-serif;">
